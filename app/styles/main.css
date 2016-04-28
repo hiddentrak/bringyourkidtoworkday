@@ -92,6 +92,24 @@ ul.hearts li span {
   background: url('/images/welcome.png') no-repeat center center;
   height: 311px;
 }
+#joke-btn-label {
+  font-size:36px;
+  font-family: monospace;
+  color: #e703ba;
+}
+div.emoji {
+  width:100%;
+}
+h1.twa {
+  background-repeat: repeat-x;
+  width:100%;
+  font-size:64px;
+}
+button.twa {
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+}
 
 .jumbotron .btn {
   font-size: 21px;
