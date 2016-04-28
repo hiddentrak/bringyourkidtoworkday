@@ -78,6 +78,10 @@ ul.hearts li span {
   background: url('/images/games.png') no-repeat center center;
   height: 311px;
 }
+.jokes {
+  background: url('/images/jokes.png') no-repeat center center;
+  height: 311px;
+}
 .welcome {
   background: url('/images/welcome.png') no-repeat center center;
   height: 311px;
