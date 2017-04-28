@@ -179,6 +179,7 @@
         console.log("togglePause");
         game.physics.arcade.isPaused = (game.physics.arcade.isPaused) ? false : true;
         var val = isPaused() ? "Paused" : "Play";
+        girl.inputEnabled = !isPaused();
         showLabel(val);
     }
 
