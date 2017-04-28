@@ -9,6 +9,10 @@
     var cases = [];
     var emitter;
     var spaceKey;
+    var casePower = 0;
+    var scoreText;
+    var isGameOver = false;
+    var caseCount = 100;
 
     function preload () {
 
@@ -67,11 +71,39 @@
         }
     }
 
+    function endGame() {
+        game.physics.arcade.isPaused = true;
+        var winTween = game.add.tween(girl).to( { x: game.world.centerX }, 500, "Linear", true);
+        game.add.tween(girl).to( { y: game.world.centerY }, 500, "Linear", true);
+        var spin = game.add.tween(girl).to({angle:360}, 500, "Linear", true);
+
+        spin.repeat(2, 0);
+        showLabel("YOU WIN!!!!");
+
+    }
+
     function updateCases() {
 
         cases.forEach(function(bCase, index){
             bCase.x += bCase.vX;
             bCase.y += bCase.vY;
+
+            if(bCase.x > girl.x-girl.width/2
+                && bCase.x < girl.x+girl.width/2
+                && bCase.y > girl.y-girl.height/2
+                && bCase.y < girl.y+girl.height/2) {
+                    //collision
+                    //remove case and delete from cases array;
+                    cases.splice(index,1);
+                    bCase.destroy();
+                    casePower++;
+                    scoreText.setText(casePower);
+                    if(casePower === caseCount) {
+                        endGame();
+                    }
+                    return;
+
+                }
 
             if (bCase.x > 700 || bCase.x < 0){
                 bCase.vX = -bCase.vX;
@@ -84,7 +116,7 @@
     }
 
     function update () {
-        if(init && girl && !isPaused()) {
+        if(init && girl && !isPaused() && !isGameOver) {
             updateGirl();
             updateCases();
         }
@@ -111,29 +143,57 @@
         return game.physics.arcade.isPaused;
     }
 
+    function showLabel(val, styleParam) {
+        var style = styleParam || { font: "32px Arial", fill: "#fff", align:"center"};
+        var labelText;
+        var fade;
+        var scale;
+
+        var killLabel = function() {
+            labelText.destroy();
+        }
+
+        //  The Text is positioned at 0, 100
+        labelText = game.add.text(game.world.centerX, game.world.centerY, val, style);
+        labelText.anchor.setTo(0.5, 0.5);
+
+        fade = game.add.tween(labelText).to( { alpha: 0 }, 500, "Linear", true);
+        game.add.tween(labelText.scale).to({x:10, y:10}, 500, "Linear", true);
+
+        fade.onComplete.add(killLabel);
+        fade.start();
+    }
+
     function togglePause() {
         console.log("togglePause");
         game.physics.arcade.isPaused = (game.physics.arcade.isPaused) ? false : true;
+        var val = isPaused() ? "Paused" : "Play";
+        showLabel(val);
     }
 
+    function addScoreboard() {
+        var style = { font: "24px Arial", fill: "#fff", align:"left"};
+        var label = game.add.text(game.world.width-150, 20, "Score : ", style);
+        scoreText = game.add.text((game.world.width-150 + label.width), 20, "0", style);
+    }
     function setupGame() {
         groundY = game.world.height - 100;
         init = true;
 
         var sky = game.add.sprite(0, 0, 'sky');
 
-        addCases(100);
+        addCases(caseCount);
 
         girl = game.add.sprite(50, groundY, "girl");
         girl.anchor.setTo(0.5, 0.5);
         game.physics.arcade.enable(girl);
 
+        addScoreboard();
 
         platforms = game.add.group();
         platforms.enableBody = true;
         // Here we create the ground.
-        var ground = platforms.create(0, game.world.height - 50, 'ground');
-        ground.scale.setTo(2, 2);
+        var ground = platforms.create(0, game.world.height - 187, 'ground');
 
         //  This stops it from falling away when you jump on it
         ground.body.immovable = true;
