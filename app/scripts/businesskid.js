@@ -54,9 +54,7 @@
             girl.x -= 5;
         }else if (cursors.right.isDown){
             girl.x += 5;
-        }else {
-            girl.body.velocity.set(0);
-        };
+        }
 
         if (girl.y > groundY){
             girl.y=groundY;
@@ -73,11 +71,17 @@
 
     function endGame() {
         game.physics.arcade.isPaused = true;
+        var showRestartLabel = function(){
+            showLabel("CLICK ME PLAY AGAIN!", {noScale:true, speed:2000});
+        }
         var winTween = game.add.tween(girl).to( { x: game.world.centerX }, 500, "Linear", true);
         game.add.tween(girl).to( { y: game.world.centerY }, 500, "Linear", true);
         var spin = game.add.tween(girl).to({angle:360}, 500, "Linear", true);
-
         spin.repeat(2, 0);
+
+        spin.onComplete.add(showRestartLabel);
+        girl.events.onInputDown.add(restartGame, this);
+
         showLabel("YOU WIN!!!!");
 
     }
@@ -125,6 +129,7 @@
     function addCase(){
         var bCase = game.add.sprite(Math.random()*game.world.width, Math.random()*game.world.height, "case");
         var speed = Math.round(Math.random()*10);
+        speed = (speed < 1 ) ? 1 : speed;
         bCase.vX = speed;
         bCase.vY = speed;
         bCase.anchor.setTo(0.5, 0.5);
@@ -143,8 +148,10 @@
         return game.physics.arcade.isPaused;
     }
 
-    function showLabel(val, styleParam) {
-        var style = styleParam || { font: "32px Arial", fill: "#fff", align:"center"};
+    function showLabel(val, options) {
+        options = (typeof options !== 'undefined') ? options : {};
+        var style = options.style || { font: "32px Arial", fill: "#fff", align:"center"};
+        var speed = options.speed || 500;
         var labelText;
         var fade;
         var scale;
@@ -157,8 +164,12 @@
         labelText = game.add.text(game.world.centerX, game.world.centerY, val, style);
         labelText.anchor.setTo(0.5, 0.5);
 
-        fade = game.add.tween(labelText).to( { alpha: 0 }, 500, "Linear", true);
-        game.add.tween(labelText.scale).to({x:10, y:10}, 500, "Linear", true);
+
+
+        fade = game.add.tween(labelText).to( { alpha: 0 }, speed, "Linear", true);
+        if(!options.noScale) {
+            game.add.tween(labelText.scale).to({x:10, y:10}, speed, "Linear", true);
+        }
 
         fade.onComplete.add(killLabel);
         fade.start();
@@ -176,6 +187,13 @@
         var label = game.add.text(game.world.width-150, 20, "Score : ", style);
         scoreText = game.add.text((game.world.width-150 + label.width), 20, "0", style);
     }
+    function restartGame() {
+        casePower = 0;
+        cases = [];
+        game.physics.arcade.isPaused = false;
+        girl.events.onInputDown.remove(restartGame, this);;
+        addCases(caseCount);
+    }
     function setupGame() {
         groundY = game.world.height - 100;
         init = true;
@@ -186,8 +204,8 @@
 
         girl = game.add.sprite(50, groundY, "girl");
         girl.anchor.setTo(0.5, 0.5);
-        game.physics.arcade.enable(girl);
-
+        girl.inputEnabled = true;
+        girl.input.enableDrag(true);
         addScoreboard();
 
         platforms = game.add.group();

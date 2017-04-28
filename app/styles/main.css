@@ -48,9 +48,15 @@ body {
 .container-narrow > hr {
   margin: 30px 0;
 }
-
+.game-link {
+    font-size: 120%;
+    font-weight: bold;
+}
 .lola {
   color: violet;
+}
+ul.lola {
+    padding-top:10px;
 }
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover {
